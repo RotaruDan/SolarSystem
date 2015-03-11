@@ -81,7 +81,7 @@ int main(int argc, char* argv[]){
 
 	Disk earthOrbit;
 	earthOrbit.setColor(1.0, 1.0, 0.0, 1.0);
-	earthOrbit.setAngle(90);					//Why?
+	earthOrbit.setAngle(90);					
 	earthOrbit.setAngleVector(1, 0, 0);
 	solarSystem.addChildren(&earthOrbit);
 
@@ -96,7 +96,7 @@ int main(int argc, char* argv[]){
 
 	Disk moonOrbit(46, 48, 30, 1);
 	moonOrbit.setColor(1, 0.58f, 0, 1);
-	moonOrbit.setAngle(90);					//Why?
+	moonOrbit.setAngle(90);					
 	moonOrbit.setAngleVector(1, 0, 0);
 	earthSystem.addChildren(&moonOrbit);
 
@@ -140,20 +140,37 @@ void initGL(){
 
 	// Activar características de OpenGL
 	glEnable(GL_LIGHTING);
-	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST);		// z buffer enable
 	glEnable(GL_NORMALIZE);
 	glEnable(GL_COLOR_MATERIAL);   
 
-	// Light0  set up
+	GLfloat mat_diffuse[] = {1.0f, 0.0f, 0.0f, 1.0f};
+	GLfloat mat_specular[] = {0.0f, 0.0f, 1.0f, 1.0f};
+	GLfloat mat_ambient[] = {0.0f, 1.0f, 0.0f, 1.0f};
+	GLfloat mat_shininess[] = {50.0f};
+
+	GLfloat light_specular[] = {1.0f, 1.0f, 1.0f, 1.0f};
+	GLfloat light_diffuse[] = {1.0f, 1.0f, 1.0f, 1.0f};
+	GLfloat light_ambient[] = {0.0f, 0.0f, 0.0f, 1.0f};
+	GLfloat light_position[] = {0, 0, 0, 1.0f};
+	
+	// enable lighting
+	glEnable(GL_LIGHTING);
+	// set light property
 	glEnable(GL_LIGHT0);
-	GLfloat LuzDifusa[4]={1.0, 1.0, 1.0, 1.0};
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, LuzDifusa);
-	GLfloat LuzAmbiente[4]={0.3f, 0.3f, 0.3f, 1.0f};
-	glLightfv(GL_LIGHT0, GL_AMBIENT, LuzAmbiente);
-	GLfloat posLuz0[4]= {100.0, 100.0, 100.0, 0.0}; 
-	glLightfv(GL_LIGHT0, GL_POSITION, posLuz0); 
+	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
 
+	// set material property
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+	glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
+	glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
 
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glShadeModel(GL_SMOOTH);
 
 	glClearColor(0.7f, 0.8f, 0.9f, 1.0f);
 
