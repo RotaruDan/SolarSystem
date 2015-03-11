@@ -1,0 +1,26 @@
+﻿Build started 11/03/2015 19:35:43.
+     1>Project "C:\Users\Cristian\Dropbox\Máster\GC\practica1\SolarSystem\freeglut project 3D\freeglut project 3D.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /I"C:\Users\Cristian\Dropbox\Máster\GC\practica1\SolarSystem\freeglut\include\\" /ZI /nologo /W3 /WX- /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt Actor.cpp Axis.cpp Group.cpp main1.cpp Disk.cpp Satelite.cpp Sphere.cpp
+         Sphere.cpp
+         Satelite.cpp
+         Disk.cpp
+         main1.cpp
+         Group.cpp
+         Axis.cpp
+         Actor.cpp
+         Generating Code...
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Cristian\Dropbox\Máster\GC\practica1\SolarSystem\Debug\SolarSystem.exe" /INCREMENTAL /NOLOGO /LIBPATH:"C:\Users\Cristian\Dropbox\Máster\GC\practica1\SolarSystem\freeglut\lib\\" kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Cristian\Dropbox\Máster\GC\practica1\SolarSystem\Debug\SolarSystem.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Cristian\Dropbox\Máster\GC\practica1\SolarSystem\Debug\SolarSystem.lib" /MACHINE:X86 Debug\Actor.obj
+         Debug\Axis.obj
+         Debug\Group.obj
+         Debug\main1.obj
+         Debug\Disk.obj
+         Debug\Satelite.obj
+         Debug\Sphere.obj
+         freeglut project 3D.vcxproj -> C:\Users\Cristian\Dropbox\Máster\GC\practica1\SolarSystem\Debug\SolarSystem.exe
+     1>Done Building Project "C:\Users\Cristian\Dropbox\Máster\GC\practica1\SolarSystem\freeglut project 3D\freeglut project 3D.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:24.88
