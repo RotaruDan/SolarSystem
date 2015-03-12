@@ -4,7 +4,7 @@
 #include "Satelite.h"
 
 	Satelite::Satelite(){
-		scale = 30;
+		scale = 15;
 	}
 
 	Satelite::Satelite(GLdouble scale){
@@ -16,6 +16,7 @@
 	}
 
 	void Satelite::draw(){
+		glRotated(90, 0, 0, 1);
 		glTranslated(0, -scale, 0);
 		drawPiramid();
 		glTranslated(0, 2*scale, 0);

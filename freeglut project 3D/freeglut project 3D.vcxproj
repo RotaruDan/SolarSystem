@@ -70,19 +70,27 @@
   <ItemGroup>
     <ClCompile Include="Actor.cpp" />
     <ClCompile Include="Axis.cpp" />
+    <ClCompile Include="Earth.cpp" />
     <ClCompile Include="Group.cpp" />
     <ClCompile Include="main1.cpp" />
     <ClCompile Include="Disk.cpp" />
     <ClCompile Include="Satelite.cpp" />
     <ClCompile Include="Sphere.cpp" />
+    <ClCompile Include="TextureLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Actor.h" />
     <ClInclude Include="Axis.h" />
+    <ClInclude Include="Earth.h" />
     <ClInclude Include="Group.h" />
     <ClInclude Include="Disk.h" />
     <ClInclude Include="Satelite.h" />
     <ClInclude Include="Sphere.h" />
+    <ClInclude Include="TextureLoader.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\..\..\..\Downloads\earth.bmp" />
+    <Image Include="..\..\..\..\..\..\Downloads\sun.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

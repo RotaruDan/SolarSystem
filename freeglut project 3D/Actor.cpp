@@ -81,8 +81,8 @@
 	void Actor::render(){
 		glPushMatrix();
 		glColor4f(r, g, b, a);
-		glTranslated(x, y, z);
 		glRotated(angle, angleX, angleY, angleZ);
+		glTranslated(x, y, z);
 		draw();
 		glPopMatrix();
 	}

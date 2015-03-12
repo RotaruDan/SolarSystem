@@ -19,6 +19,12 @@
     <Filter Include="Source Files\Objects sources">
       <UniqueIdentifier>{3ff0fa80-cdbd-42b5-a92f-57fc704ba6ad}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Utils">
+      <UniqueIdentifier>{497ae497-f737-4af4-bdda-6eba8cf7e2e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Utils">
+      <UniqueIdentifier>{2fd11281-6257-401f-b7a6-89e789165372}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main1.cpp">
@@ -42,6 +48,12 @@
     <ClCompile Include="Satelite.cpp">
       <Filter>Source Files\Objects sources</Filter>
     </ClCompile>
+    <ClCompile Include="TextureLoader.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Earth.cpp">
+      <Filter>Source Files\Objects sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Actor.h">
@@ -62,5 +74,19 @@
     <ClInclude Include="Satelite.h">
       <Filter>Header Files\Objects</Filter>
     </ClInclude>
+    <ClInclude Include="TextureLoader.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Earth.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\..\..\..\Downloads\earth.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\..\Downloads\sun.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

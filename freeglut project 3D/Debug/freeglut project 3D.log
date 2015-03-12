@@ -1,15 +1,11 @@
-﻿Build started 11/03/2015 19:35:43.
+﻿Build started 12/03/2015 17:01:50.
      1>Project "C:\Users\Cristian\Dropbox\Máster\GC\practica1\SolarSystem\freeglut project 3D\freeglut project 3D.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /I"C:\Users\Cristian\Dropbox\Máster\GC\practica1\SolarSystem\freeglut\include\\" /ZI /nologo /W3 /WX- /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt Actor.cpp Axis.cpp Group.cpp main1.cpp Disk.cpp Satelite.cpp Sphere.cpp
-         Sphere.cpp
-         Satelite.cpp
-         Disk.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /I"C:\Users\Cristian\Dropbox\Máster\GC\practica1\SolarSystem\freeglut\include\\" /ZI /nologo /W3 /WX- /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt main1.cpp
          main1.cpp
-         Group.cpp
-         Axis.cpp
-         Actor.cpp
-         Generating Code...
+     1>c:\users\cristian\dropbox\máster\gc\practica1\solarsystem\freeglut project 3d\main1.cpp(252): warning C4244: '=' : conversion from 'GLdouble' to 'GLfloat', possible loss of data
+     1>c:\users\cristian\dropbox\máster\gc\practica1\solarsystem\freeglut project 3d\main1.cpp(253): warning C4244: '=' : conversion from 'GLdouble' to 'GLfloat', possible loss of data
+     1>c:\users\cristian\dropbox\máster\gc\practica1\solarsystem\freeglut project 3d\main1.cpp(254): warning C4244: '=' : conversion from 'GLdouble' to 'GLfloat', possible loss of data
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Cristian\Dropbox\Máster\GC\practica1\SolarSystem\Debug\SolarSystem.exe" /INCREMENTAL /NOLOGO /LIBPATH:"C:\Users\Cristian\Dropbox\Máster\GC\practica1\SolarSystem\freeglut\lib\\" kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Cristian\Dropbox\Máster\GC\practica1\SolarSystem\Debug\SolarSystem.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Cristian\Dropbox\Máster\GC\practica1\SolarSystem\Debug\SolarSystem.lib" /MACHINE:X86 Debug\Actor.obj
          Debug\Axis.obj
@@ -23,4 +19,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:24.88
+Time Elapsed 00:00:02.89

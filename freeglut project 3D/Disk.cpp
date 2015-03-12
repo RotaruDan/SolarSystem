@@ -6,9 +6,9 @@
 using namespace std;
 
 	Disk::Disk(){
-		innerRadius = 147.5;
-		outerRadius = 152.5;
-		slices = 100;
+		innerRadius = 68.5;
+		outerRadius = 71.5;
+		slices = 80;
 		loops = 1;
 		init();
 	}
