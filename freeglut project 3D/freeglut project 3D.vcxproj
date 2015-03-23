@@ -71,21 +71,27 @@
     <ClCompile Include="Actor.cpp" />
     <ClCompile Include="Axis.cpp" />
     <ClCompile Include="Earth.cpp" />
+    <ClCompile Include="glm.cpp" />
     <ClCompile Include="Group.cpp" />
     <ClCompile Include="main1.cpp" />
     <ClCompile Include="Disk.cpp" />
+    <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Satelite.cpp" />
     <ClCompile Include="Sphere.cpp" />
+    <ClCompile Include="Sun.cpp" />
     <ClCompile Include="TextureLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Actor.h" />
     <ClInclude Include="Axis.h" />
     <ClInclude Include="Earth.h" />
+    <ClInclude Include="glm.h" />
     <ClInclude Include="Group.h" />
     <ClInclude Include="Disk.h" />
+    <ClInclude Include="Mesh.h" />
     <ClInclude Include="Satelite.h" />
     <ClInclude Include="Sphere.h" />
+    <ClInclude Include="Sun.h" />
     <ClInclude Include="TextureLoader.h" />
   </ItemGroup>
   <ItemGroup>

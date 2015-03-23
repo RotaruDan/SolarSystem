@@ -7,8 +7,11 @@
 
 #include <GL/freeglut.h>
 
+#include "Mesh.h"
+#include "Sun.h"
 #include "Axis.h" 
 #include "Sphere.h" 
+#include "Earth.h" 
 #include "Disk.h" 
 #include "Satelite.h" 
 #include "Group.h"
@@ -35,8 +38,9 @@ viewCamera * currentView = &initial;
 GLfloat light_position1[] = {0, 0, 0, 1.0f};
 
 // Scene
+Mesh plane("f-16.obj", 2);
 Group root;
-Sphere sun;
+Sun sun;
 Group earthSystem;
 Satelite satelite;
 Sphere moon(4, 10, 10);
@@ -69,6 +73,7 @@ int main(int argc, char* argv[]){
 	glutSpecialFunc(keySp);
 	// OpenGL basic setting
 	initGL();
+
 	// iniciar la escena desde la raiz
 
 	// Axis for debugging
@@ -95,12 +100,14 @@ int main(int argc, char* argv[]){
 	earthSystem.setX(70);
 	earthSystem.setAngleVector(0, 1, 0);
 
-	Sphere earth(12, 20, 20);
-	earth.setColor(1, 0.58f, 0, 1);
+	Earth earth;
+	earth.setColor(1, 1, 1, 1);
+	earth.setAngle(-90);
+	earth.setAngleVector(1, 0, 0);
 	earthSystem.addChildren(&earth);
 
 	Disk moonOrbit(26.5, 27.5, 30, 1);
-	moonOrbit.setColor(1, 0.58f, 0, 1);
+	moonOrbit.setColor(1, 1, 1, 1);
 	moonOrbit.setAngle(90);					
 	moonOrbit.setAngleVector(1, 0, 0);
 	earthSystem.addChildren(&moonOrbit);
@@ -115,11 +122,20 @@ int main(int argc, char* argv[]){
 	earthSystem.addChildren(&sateliteOrbit);
 
 	satelite.setColor(0, 1, 0, 1);
-	satelite.setAngleVector(0, 1, 0);
-	satelite.setAngle(90);
 	satelite.setAngleVector(0, 0, 1);
 	satelite.setY(27);
 	earthSystem.addChildren(&satelite);
+
+	Disk planeOrbit(26.5, 27.5, 30, 1);
+	planeOrbit.setColor(0, 1, 1, 1);
+	planeOrbit.setAngle(90);
+	planeOrbit.setAngleVector(0, 1, 0);
+	earthSystem.addChildren(&planeOrbit);
+
+	plane.setColor(0, 1, 1, 1);
+	plane.setAngleVector(1, 0, 0);
+	plane.setY(27);
+	earthSystem.addChildren(&plane);
   
 	initScene();
 	// Classic glut's main loop can be stopped after X-closing the window, using freeglut's setting
@@ -164,10 +180,11 @@ void initScene(){
 void initGL(){
 
 	// Activar características de OpenGL
-	glEnable(GL_LIGHTING);
+	//glEnable(GL_LIGHTING);
 	glEnable(GL_DEPTH_TEST);		// z buffer enable
 	glEnable(GL_NORMALIZE);
 	glEnable(GL_COLOR_MATERIAL);   
+	glEnable(GL_TEXTURE_2D); 
 
 	GLfloat mat_diffuse[] = {1.0f, 0.0f, 0.0f, 1.0f};
 	GLfloat mat_specular[] = {0.0f, 0.0f, 1.0f, 1.0f};
@@ -194,16 +211,18 @@ void initGL(){
 	glLightfv(GL_LIGHT1, GL_DIFFUSE, light_diffuse1);
 	glLightfv(GL_LIGHT1, GL_SPECULAR, light_specular1);
 	glLightfv(GL_LIGHT1, GL_AMBIENT, light_ambient);
+	
 
 	// set material property
 	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
 	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
 	glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
 	glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+	// SOL --> glMaterialfv(GL_FRONT, GL_EMISSION, mat_shininess);
 
 	glShadeModel(GL_SMOOTH);
 
-	glClearColor(0.7f, 0.8f, 0.9f, 1.0f);
+	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
 	// Viewport set up
 	glViewport(0,0, Vp.w, Vp.h);  // Vp
@@ -237,21 +256,21 @@ void resize(int wW, int wH){
 void updateProjection(){
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	Pj.xRight = Vp.w/ 2.0 / scale; Pj.xLeft = -Pj.xRight; 
-	Pj.yTop = Vp.h/2.0 / scale;  Pj.yBot = -Pj.yTop; 
 	if(ortho){
-		glOrtho(Pj.xLeft,Pj.xRight, Pj.yBot,Pj.yTop, Pj.zNear,Pj.zFar);
+		Pj.xRight = Vp.w/ 2.0 / scale; Pj.xLeft = -Pj.xRight; 
+		Pj.yTop = Vp.h/2.0 / scale;  Pj.yBot = -Pj.yTop; 
+		glOrtho(Pj.xLeft,Pj.xRight, Pj.yBot,Pj.yTop, Pj.zNear, Pj.zFar);
 	} else {
-		gluPerspective(60, Vp.w / Vp.h, Pj.zNear, Pj.zFar );
+		gluPerspective(80, Vp.w / Vp.h, Pj.zNear, Pj.zFar );
 	}
 }
 //---------------------------------------------------------------------------
 
 void display(void) {
 	
-	light_position1[0] = (*currentView).eyeX;
-	light_position1[1] = (*currentView).eyeY;
-	light_position1[2] = (*currentView).eyeZ;
+	light_position1[0] = static_cast<GLfloat>((*currentView).eyeX);
+	light_position1[1] = static_cast<GLfloat>((*currentView).eyeY);
+	light_position1[2] = static_cast<GLfloat>((*currentView).eyeZ);
 	glLightfv(GL_LIGHT1, GL_POSITION, light_position1);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  
@@ -292,6 +311,7 @@ void keyPres(unsigned char key, int mX, int mY){
 		sun.setAngle(sun.getAngle() + 5); 
 		earthSystem.setAngle(earthSystem.getAngle() + 4); 
 		satelite.setAngle(satelite.getAngle() + 2); 
+		plane.setAngle(plane.getAngle() + 2); 
 		moon.setAngle(moon.getAngle() + 3); 
 	} else if(key == 't') { 
 		tiling = !tiling; 
@@ -333,6 +353,56 @@ void keyPres(unsigned char key, int mX, int mY){
 			currentView->eyeZ += 5;	  
 		} else if(currentView == &topView){
 			currentView->eyeY += 5;
+		}
+		updateCamera();
+	}  else if(key == 'u') {
+		if(currentView == &initial){
+			currentView->eyeX -= 5;
+			currentView->eyeZ += 5;	  
+		} else if(currentView == &lateral){
+			currentView->eyeZ += 5;	  
+		} else if(currentView == &front){
+			currentView->eyeX -= 5;	  
+		} else if(currentView == &topView){
+			currentView->eyeZ -= 5;
+			currentView->eyeX += 5;	  
+		}
+		updateCamera();
+	} else if(key == 'U') {
+		if(currentView == &initial){
+			currentView->eyeX += 5;
+			currentView->eyeZ -= 5;	  
+		} else if(currentView == &lateral){
+			currentView->eyeZ -= 5;	  
+		} else if(currentView == &front){
+			currentView->eyeX += 5;	  
+		} else if(currentView == &topView){
+			currentView->eyeZ += 5;
+			currentView->eyeX -= 5;	  
+		}
+		updateCamera();
+	}  else if(key == 'v') {
+		if(currentView == &initial){
+			currentView->eyeY -= 5;
+		} else if(currentView == &lateral){
+			currentView->eyeY -= 5;	  
+		} else if(currentView == &front){
+			currentView->eyeY -= 5;	  
+		} else if(currentView == &topView){
+			currentView->eyeX -= 5;
+			currentView->eyeZ -= 5;
+		}
+		updateCamera();
+	} else if(key == 'V') {
+		if(currentView == &initial){
+			currentView->eyeY += 5;
+		} else if(currentView == &lateral){
+			currentView->eyeY += 5;	  
+		} else if(currentView == &front){
+			currentView->eyeY += 5;	  
+		} else if(currentView == &topView){
+			currentView->eyeX += 5;
+			currentView->eyeZ += 5;
 		}
 		updateCamera();
 	} else {

@@ -9,10 +9,12 @@
 class Sphere : public Actor {
 
 	private:
-		GLUquadric * quadric;
 		GLdouble radius;
 		GLint slices, stacks;
 		void init();
+
+	protected:	
+		GLUquadric * quadric;
 
 	public:
 		Sphere();

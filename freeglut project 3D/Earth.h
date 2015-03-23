@@ -9,6 +9,7 @@
 class Earth : public Sphere {
 
 	private:
+		GLuint textureID;
 		void init();
 
 	public:
