@@ -4,9 +4,9 @@
 #include "Sphere.h"
 
 	Sphere::Sphere(){
-		radius = 20.0;
-		slices = 25;
-		stacks = 25;
+		radius = 45.0;
+		slices = 60;
+		stacks = 60;
 		init();
 	}
 

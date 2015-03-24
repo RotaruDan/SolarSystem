@@ -4,7 +4,7 @@
 #include "Satelite.h"
 
 	Satelite::Satelite(){
-		scale = 12;
+		scale = 20;
 	}
 
 	Satelite::Satelite(GLdouble scale){
