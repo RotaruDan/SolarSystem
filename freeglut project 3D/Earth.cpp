@@ -4,7 +4,7 @@
 #include "Earth.h"
 #include "TextureLoader.h"
 
-	Earth::Earth() : Sphere(15, 22, 22){
+	Earth::Earth() : Sphere(30, 45, 45){
 		init();
 	}
 

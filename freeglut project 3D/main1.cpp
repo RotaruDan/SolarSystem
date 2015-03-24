@@ -7,6 +7,7 @@
 
 #include <GL/freeglut.h>
 
+#include <cmath>
 #include "Mesh.h"
 #include "Sun.h"
 #include "Axis.h" 
@@ -17,20 +18,22 @@
 #include "Group.h"
 //---------------------------------------------------------------------------
 
-// Viewport size  (left=right=0)
-struct viewPort{GLsizei w; GLsizei h;} Vp = {400, 400};
+// Viewport
+struct viewPort{GLsizei w; GLsizei h;} Vp = {700, 700};
+
 // Camera parameters
 struct viewCamera{GLdouble eyeX, eyeY, eyeZ;
         GLdouble lookX, lookY, lookZ;
         GLdouble upX, upY, upZ;} 
-			initial = {100, 100, 100, 0, 0, 0, 0, 1, 0}, 
-			front = {0, 0, 100, 0,0,0, 0,1,0},
-			topView = {0, 100, 0, 0,0,0, 1,0,1}, 
-			lateral = {100, 0, 0, 0,0,0, 0,1,0};
+			initial = {350, 350, 350, 0, 0, 0, 0, 1, 0}, 
+			front = {0, 0, 550, 0,0,0, 0,1,0},
+			topView = {0, 450, 0, 0,0,0, 1,0,1}, 
+			lateral = {550, 0, 0, 0,0,0, 0,1,0};
+
 // Viewing frustum parameters
 struct viewVolume{GLdouble xRight, xLeft;
         GLdouble yTop, yBot;
-        GLdouble zNear, zFar;} Pj = {200,-200, 200,-200, 1,1000};
+        GLdouble zNear, zFar;} Pj = {350, -350, 350,-350, 1, 1000};
 
 GLdouble scale = 1;
 bool tiling, ortho = true;
@@ -38,16 +41,23 @@ viewCamera * currentView = &initial;
 GLfloat light_position1[] = {0, 0, 0, 1.0f};
 
 // Scene
-Mesh plane("f-16.obj", 2);
+Mesh plane("f-16.obj", 4);
 Group root;
 Sun sun;
 Group earthSystem;
+Earth* earthRef;
 Satelite satelite;
-Sphere moon(4, 10, 10);
+Sphere moon(8, 20, 20);
 
 // prototipos
+static const unsigned int UP = 0;
+static const unsigned int DOWN = 1;
+static const unsigned int LEFT = 2;
+static const unsigned int RIGHT = 3;
 void updateProjection();
 void updateCamera();
+void rotate(double &vx, double &vy, double &vz, double ax, double ay, double az, double angle);
+void moveCamera(unsigned int direction);
 void initScene();
 void initGL();
 void resize(int wW, int wH);
@@ -97,16 +107,23 @@ int main(int argc, char* argv[]){
 
 	// Earth system
 	solarSystem.addChildren(&earthSystem);
-	earthSystem.setX(70);
+	earthSystem.setX(130);
 	earthSystem.setAngleVector(0, 1, 0);
 
 	Earth earth;
+	earthRef = &earth;
 	earth.setColor(1, 1, 1, 1);
-	earth.setAngle(-90);
-	earth.setAngleVector(1, 0, 0);
-	earthSystem.addChildren(&earth);
+	earth.setAngleVector(0, 0, 1);
 
-	Disk moonOrbit(26.5, 27.5, 30, 1);
+	// Used to rotate the earth and also to be able to
+	// control the earth's rotation
+	Group earthContainer;
+	earthContainer.addChildren(&earth);
+	earthContainer.setAngle(-90);
+	earthContainer.setAngleVector(1, 0, 0);
+	earthSystem.addChildren(&earthContainer);
+
+	Disk moonOrbit(52, 54, 60, 1);
 	moonOrbit.setColor(1, 1, 1, 1);
 	moonOrbit.setAngle(90);					
 	moonOrbit.setAngleVector(1, 0, 0);
@@ -114,19 +131,19 @@ int main(int argc, char* argv[]){
 
 	moon.setColor(1, 1, 1, 1);
 	moon.setAngleVector(0, 1, 0);
-	moon.setX(27);
+	moon.setX(53);
 	earthSystem.addChildren(&moon);
 
-	Disk sateliteOrbit(26.5, 27.5, 30, 1);
+	Disk sateliteOrbit(52, 54, 60, 1);
 	sateliteOrbit.setColor(0, 1, 0, 1);
 	earthSystem.addChildren(&sateliteOrbit);
 
 	satelite.setColor(0, 1, 0, 1);
 	satelite.setAngleVector(0, 0, 1);
-	satelite.setY(27);
+	satelite.setY(53);
 	earthSystem.addChildren(&satelite);
 
-	Disk planeOrbit(26.5, 27.5, 30, 1);
+	Disk planeOrbit(52, 54, 60, 1);
 	planeOrbit.setColor(0, 1, 1, 1);
 	planeOrbit.setAngle(90);
 	planeOrbit.setAngleVector(0, 1, 0);
@@ -134,7 +151,7 @@ int main(int argc, char* argv[]){
 
 	plane.setColor(0, 1, 1, 1);
 	plane.setAngleVector(1, 0, 0);
-	plane.setY(27);
+	plane.setY(53);
 	earthSystem.addChildren(&plane);
   
 	initScene();
@@ -147,35 +164,6 @@ int main(int argc, char* argv[]){
 	return 0;
 }
 //---------------------------------------------------------------------------
-
-void initScene(){
-	sun.setAngle(0);
-	earthSystem.setAngle(0);
-	satelite.setAngle(0);
-	moon.setAngle(0);
-	tiling = false;
-	currentView = &initial;
-
-	initial.eyeX = 100;
-	initial.eyeY = 100;
-	initial.eyeZ = 100;
-
-	front.eyeX = 0;
-	front.eyeY = 0;
-	front.eyeZ = 100;
-
-	topView.eyeX = 0;
-	topView.eyeY = 100;
-	topView.eyeZ = 0;
-
-	lateral.eyeX = 100;
-	lateral.eyeY = 0;
-	lateral.eyeZ = 0;
-
-	updateCamera();
-	ortho = true;
-	updateProjection();
-}
 
 void initGL(){
 
@@ -218,17 +206,27 @@ void initGL(){
 	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
 	glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
 	glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
-	// SOL --> glMaterialfv(GL_FRONT, GL_EMISSION, mat_shininess);
 
 	glShadeModel(GL_SMOOTH);
 
 	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
-	// Viewport set up
-	glViewport(0,0, Vp.w, Vp.h);  // Vp
 	// Camera set up
 	updateCamera();
 	// Frustum set up
+	updateProjection();
+}
+
+void initScene(){
+	sun.setAngle(0);
+	earthSystem.setAngle(0);
+	satelite.setAngle(0);
+	moon.setAngle(0);
+	tiling = false;
+	currentView = &initial;
+
+	updateCamera();
+	ortho = true;
 	updateProjection();
 }
 
@@ -256,12 +254,13 @@ void resize(int wW, int wH){
 void updateProjection(){
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
+	//Pj.xRight = Vp.w/ 2.0 / scale; Pj.xLeft = -Pj.xRight; 
+	//Pj.yTop = Vp.h/2.0 / scale;  Pj.yBot = -Pj.yTop; 
 	if(ortho){
-		Pj.xRight = Vp.w/ 2.0 / scale; Pj.xLeft = -Pj.xRight; 
-		Pj.yTop = Vp.h/2.0 / scale;  Pj.yBot = -Pj.yTop; 
 		glOrtho(Pj.xLeft,Pj.xRight, Pj.yBot,Pj.yTop, Pj.zNear, Pj.zFar);
 	} else {
-		gluPerspective(80, Vp.w / Vp.h, Pj.zNear, Pj.zFar );
+		glFrustum(Pj.xLeft,Pj.xRight, Pj.yBot,Pj.yTop, Pj.zNear*300, Pj.zFar);
+		//gluPerspective(80, Vp.w / Vp.h, Pj.zNear, Pj.zFar );
 	}
 }
 //---------------------------------------------------------------------------
@@ -295,6 +294,226 @@ void display(void) {
 }
 //---------------------------------------------------------------------------
 
+void moveCamera(unsigned int direction){
+	GLdouble eX, eY, eZ;
+	GLdouble lX, lY, lZ;
+	GLdouble uX, uY, uZ;
+	GLdouble vX, vY, vZ;
+	GLdouble wX, wY, wZ;
+	GLdouble length;
+	switch (direction)
+	{
+	case UP:
+		// Ojo
+		eX = currentView->eyeX;
+		eY = currentView->eyeY;
+		eZ = currentView->eyeZ;
+
+		// Mira
+		lX = currentView->lookX;
+		lY = currentView->lookY;
+		lZ = currentView->lookZ;
+
+		// U = Ojo - Mira
+		uX = eX - lX;
+		uY = eY - lY;
+		uZ = eZ - lZ;		
+
+		// V = -Up
+		vX = -currentView->upX;
+		vY = -currentView->upY;
+		vZ = -currentView->upZ;
+
+		// W = U x V
+		wX = uY * vZ - uZ * vY;
+		wY = uZ * vX - uX * vZ;
+		wZ = uX * vY - uY * vX;
+
+		// Compute the perpendicular of the current obtained vector
+		vX = wX;
+		vY = wY;
+		vZ = wZ;
+		
+		// W = U x V
+		wX = uY * vZ - uZ * vY;
+		wY = uZ * vX - uX * vZ;
+		wZ = uX * vY - uY * vX;
+
+		// Normaliza W
+		length = sqrt((wX * wX)+(wY * wY)+(wZ * wZ));
+		wX /= length;
+		wY /= length;
+		wZ /= length;
+
+		// Suma W al Ojo
+		currentView->eyeX += wX;
+		currentView->eyeY += wY;
+		currentView->eyeZ += wZ;
+		
+		// Suma W a la Mira
+		currentView->lookX += wX;
+		currentView->lookY += wY;
+		currentView->lookZ += wZ;
+		break;
+	case DOWN:
+		// Ojo
+		eX = currentView->eyeX;
+		eY = currentView->eyeY;
+		eZ = currentView->eyeZ;
+
+		// Mira
+		lX = currentView->lookX;
+		lY = currentView->lookY;
+		lZ = currentView->lookZ;
+
+		// U = Ojo - Mira
+		uX = eX - lX;
+		uY = eY - lY;
+		uZ = eZ - lZ;		
+
+		// V = Up
+		vX = currentView->upX;
+		vY = currentView->upY;
+		vZ = currentView->upZ;
+
+		// W = U x V
+		wX = uY * vZ - uZ * vY;
+		wY = uZ * vX - uX * vZ;
+		wZ = uX * vY - uY * vX;
+
+		// Compute the perpendicular of the current obtained vector
+		vX = wX;
+		vY = wY;
+		vZ = wZ;
+		
+		// W = U x V
+		wX = uY * vZ - uZ * vY;
+		wY = uZ * vX - uX * vZ;
+		wZ = uX * vY - uY * vX;
+
+		// Normaliza W
+		length = sqrt((wX * wX)+(wY * wY)+(wZ * wZ));
+		wX /= length;
+		wY /= length;
+		wZ /= length;
+
+		// Suma W al Ojo
+		currentView->eyeX += wX;
+		currentView->eyeY += wY;
+		currentView->eyeZ += wZ;
+		
+		// Suma W a la Mira
+		currentView->lookX += wX;
+		currentView->lookY += wY;
+		currentView->lookZ += wZ;
+		break;
+	case LEFT:
+		// Ojo
+		eX = currentView->eyeX;
+		eY = currentView->eyeY;
+		eZ = currentView->eyeZ;
+
+		// Mira
+		lX = currentView->lookX;
+		lY = currentView->lookY;
+		lZ = currentView->lookZ;
+
+		// U = Ojo - Mira
+		uX = eX - lX;
+		uY = eY - lY;
+		uZ = eZ - lZ;		
+
+		// V = Up
+		vX = currentView->upX;
+		vY = currentView->upY;
+		vZ = currentView->upZ;
+
+		// W = U x V
+		wX = uY * vZ - uZ * vY;
+		wY = uZ * vX - uX * vZ;
+		wZ = uX * vY - uY * vX;
+
+		// Normaliza W
+		length = sqrt((wX * wX)+(wY * wY)+(wZ * wZ));
+		wX /= length;
+		wY /= length;
+		wZ /= length;
+
+		// Suma W al Ojo
+		currentView->eyeX += wX;
+		currentView->eyeY += wY;
+		currentView->eyeZ += wZ;
+		
+		// Suma W a la Mira
+		currentView->lookX += wX;
+		currentView->lookY += wY;
+		currentView->lookZ += wZ;
+		break;
+	case RIGHT:
+		// Ojo
+		eX = currentView->eyeX;
+		eY = currentView->eyeY;
+		eZ = currentView->eyeZ;
+
+		// Mira
+		lX = currentView->lookX;
+		lY = currentView->lookY;
+		lZ = currentView->lookZ;
+
+		// U = Ojo - Mira
+		uX = eX - lX;
+		uY = eY - lY;
+		uZ = eZ - lZ;		
+
+		// V = -Up
+		vX = -currentView->upX;
+		vY = -currentView->upY;
+		vZ = -currentView->upZ;
+
+		// W = U x V
+		wX = uY * vZ - uZ * vY;
+		wY = uZ * vX - uX * vZ;
+		wZ = uX * vY - uY * vX;
+
+		// Normaliza W
+		length = sqrt((wX * wX)+(wY * wY)+(wZ * wZ));
+		wX /= length;
+		wY /= length;
+		wZ /= length;
+
+		// Suma W al Ojo
+		currentView->eyeX += wX;
+		currentView->eyeY += wY;
+		currentView->eyeZ += wZ;
+		
+		// Suma W a la Mira
+		currentView->lookX += wX;
+		currentView->lookY += wY;
+		currentView->lookZ += wZ;
+		break;
+	default:
+		break;
+	}
+}
+//--------------------------------------------------------------------------
+
+// rotate the vector (vx, vy, vz) around (ax, ay, az) by an angle "angle". Avector must be normalized.
+void rotate(double &vx, double &vy, double &vz, double ax, double ay, double az, double angle) {
+  double ca = cos(angle);
+  double sa = sin(angle);
+  double crossx = -vy*az + vz*ay;
+  double crossy = -vz*ax + vx*az;
+  double crossz = -vx*ay + vy*ax;
+  double dot = ax*vx + ay*vy + az*vz;
+  double rx = vx*ca + crossx*sa + dot*ax*(1-ca);
+  double ry = vy*ca + crossy*sa + dot*ay*(1-ca);
+  double rz = vz*ca + crossz*sa + dot*az*(1-ca);
+  vx = rx; 
+  vy = ry; 
+  vz = rz;
+}
+//--------------------------------------------------------------------------
+
 void keyPres(unsigned char key, int mX, int mY){
 	bool need_redisplay = true;
 	if(key == 27) {  /* Escape key */  //continue_in_main_loop = false; (**)
@@ -310,8 +529,9 @@ void keyPres(unsigned char key, int mX, int mY){
 	} else if(key == 's') { 
 		sun.setAngle(sun.getAngle() + 5); 
 		earthSystem.setAngle(earthSystem.getAngle() + 4); 
+		(*earthRef).setAngle((*earthRef).getAngle() + 6); 
 		satelite.setAngle(satelite.getAngle() + 2); 
-		plane.setAngle(plane.getAngle() + 2); 
+		plane.setAngle(plane.getAngle() + 1); 
 		moon.setAngle(moon.getAngle() + 3); 
 	} else if(key == 't') { 
 		tiling = !tiling; 
@@ -330,80 +550,52 @@ void keyPres(unsigned char key, int mX, int mY){
 		ortho = !ortho;
 		updateProjection();
 	} else if(key == 'n') {
-		if(currentView == &initial){
-			currentView->eyeX -= 5;
-			currentView->eyeY -= 5;
-			currentView->eyeZ -= 5;	  
-		} else if(currentView == &lateral){
-			currentView->eyeX -= 5;	  
-		} else if(currentView == &front){
-			currentView->eyeZ -= 5;	  
-		} else if(currentView == &topView){
-			currentView->eyeY -= 5;
-		}
-		updateCamera();
+		Pj.xLeft += 1;
+		Pj.xRight -= 1;
+		Pj.yBot += 1;
+		Pj.yTop -= 1;
+		updateProjection();
 	} else if(key == 'N') {
-		if(currentView == &initial){
-			currentView->eyeX += 5;
-			currentView->eyeY += 5;
-			currentView->eyeZ += 5;	 
-		} else if(currentView == &lateral){
-			currentView->eyeX += 5;	  
-		} else if(currentView == &front){
-			currentView->eyeZ += 5;	  
-		} else if(currentView == &topView){
-			currentView->eyeY += 5;
-		}
-		updateCamera();
-	}  else if(key == 'u') {
-		if(currentView == &initial){
-			currentView->eyeX -= 5;
-			currentView->eyeZ += 5;	  
-		} else if(currentView == &lateral){
-			currentView->eyeZ += 5;	  
-		} else if(currentView == &front){
-			currentView->eyeX -= 5;	  
-		} else if(currentView == &topView){
-			currentView->eyeZ -= 5;
-			currentView->eyeX += 5;	  
-		}
+		Pj.xLeft -= 1;
+		Pj.xRight += 1;
+		Pj.yBot -= 1;
+		Pj.yTop += 1;
+		updateProjection();
+	} else if(key == 'u') {
+		moveCamera(RIGHT);
 		updateCamera();
 	} else if(key == 'U') {
-		if(currentView == &initial){
-			currentView->eyeX += 5;
-			currentView->eyeZ -= 5;	  
-		} else if(currentView == &lateral){
-			currentView->eyeZ -= 5;	  
-		} else if(currentView == &front){
-			currentView->eyeX += 5;	  
-		} else if(currentView == &topView){
-			currentView->eyeZ += 5;
-			currentView->eyeX -= 5;	  
-		}
+		moveCamera(LEFT);
 		updateCamera();
-	}  else if(key == 'v') {
-		if(currentView == &initial){
-			currentView->eyeY -= 5;
-		} else if(currentView == &lateral){
-			currentView->eyeY -= 5;	  
-		} else if(currentView == &front){
-			currentView->eyeY -= 5;	  
-		} else if(currentView == &topView){
-			currentView->eyeX -= 5;
-			currentView->eyeZ -= 5;
-		}
+	} else if(key == 'v') {
+		moveCamera(UP);
 		updateCamera();
 	} else if(key == 'V') {
-		if(currentView == &initial){
-			currentView->eyeY += 5;
-		} else if(currentView == &lateral){
-			currentView->eyeY += 5;	  
-		} else if(currentView == &front){
-			currentView->eyeY += 5;	  
-		} else if(currentView == &topView){
-			currentView->eyeX += 5;
-			currentView->eyeZ += 5;
-		}
+		moveCamera(DOWN);
+		updateCamera();
+	} else if(key == 'g') {
+		GLdouble uX = currentView->upX;
+		GLdouble uY = currentView->upY; 
+		GLdouble uZ = currentView->upZ;
+
+		GLdouble length = sqrt((uX*uX)+(uY*uY)+(uZ*uZ));
+		uX /= length;
+		uY /= length;
+		uZ /= length;
+
+		rotate(currentView->eyeX, currentView->eyeY, currentView->eyeZ, uX, uY, uZ, 0.1);
+		updateCamera();
+	} else if(key == 'G') {
+		GLdouble uX = currentView->upX;
+		GLdouble uY = currentView->upY; 
+		GLdouble uZ = currentView->upZ;
+
+		GLdouble length = sqrt((uX*uX)+(uY*uY)+(uZ*uZ));
+		uX /= length;
+		uY /= length;
+		uZ /= length;
+
+		rotate(currentView->eyeX, currentView->eyeY, currentView->eyeZ, uX, uY, uZ, -0.1);
 		updateCamera();
 	} else {
 		need_redisplay = false;
