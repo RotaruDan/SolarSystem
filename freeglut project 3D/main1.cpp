@@ -21,7 +21,7 @@
 // Viewport
 struct viewPort{GLsizei w; GLsizei h;} Vp = {700, 700};
 
-// Camera parameters
+// Camera parameters, those values are overriden on initScene() method.
 struct viewCamera{GLdouble eyeX, eyeY, eyeZ;
         GLdouble lookX, lookY, lookZ;
         GLdouble upX, upY, upZ;} 
@@ -224,6 +224,46 @@ void initScene(){
 	moon.setAngle(0);
 	tiling = false;
 	currentView = &initial;
+
+	initial.eyeX = 350;
+	initial.eyeY = 350;
+	initial.eyeZ = 350;
+	initial.lookX = 0;
+	initial.lookY = 0;
+	initial.lookZ = 0;
+	initial.upX = 0;
+	initial.upY = 1;
+	initial.upZ = 0;
+
+	front.eyeX = 0;
+	front.eyeY = 0;
+	front.eyeZ = 550;
+	front.lookX = 0;
+	front.lookY = 0;
+	front.lookZ = 0;
+	front.upX = 0;
+	front.upY = 1;
+	front.upZ = 0;
+
+	topView.eyeX = 0;
+	topView.eyeY = 450;
+	topView.eyeZ = 0;
+	topView.lookX = 0;
+	topView.lookY = 0;
+	topView.lookZ = 0;
+	topView.upX = 1;
+	topView.upY = 0;
+	topView.upZ = 1;
+
+	lateral.eyeX = 550;
+	lateral.eyeY = 0;
+	lateral.eyeZ = 0;
+	lateral.lookX = 0;
+	lateral.lookY = 0;
+	lateral.lookZ = 0;
+	lateral.upX = 0;
+	lateral.upY = 1;
+	lateral.upZ = 0;
 
 	updateCamera();
 	ortho = true;
