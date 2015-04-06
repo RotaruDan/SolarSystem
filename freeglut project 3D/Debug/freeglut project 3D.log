@@ -1,4 +1,4 @@
-﻿Build started 25/03/2015 11:48:31.
+﻿Build started 06/04/2015 23:08:00.
      1>Project "C:\Users\Cristian\Dropbox\Máster\GC\practica1\SolarSystem\freeglut project 3D\freeglut project 3D.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /I"C:\Users\Cristian\Dropbox\Máster\GC\practica1\SolarSystem\freeglut\include\\" /ZI /nologo /W3 /WX- /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt main1.cpp
@@ -12,6 +12,7 @@
          Debug\main1.obj
          Debug\Disk.obj
          Debug\Mesh.obj
+         Debug\pixmap24RGB.obj
          Debug\Satelite.obj
          Debug\Sphere.obj
          Debug\Sun.obj
@@ -21,4 +22,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:04.68
+Time Elapsed 00:00:03.57
