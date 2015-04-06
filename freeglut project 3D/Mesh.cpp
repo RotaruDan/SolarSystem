@@ -9,6 +9,9 @@
 
 	Mesh::Mesh(char* charname, GLfloat scale) {
 		model = glmReadOBJ(charname);
+		glmUnitize(model);
+		glmFacetNormals(model);
+		
 		glmScale(model, scale);
 	}
 

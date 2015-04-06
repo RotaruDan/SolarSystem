@@ -32,6 +32,6 @@ using namespace std;
 		gluDeleteQuadric(quadric);
 	}
 
-	void Disk::draw(){
+	void Disk::draw(){		 
 		gluDisk(quadric, innerRadius, outerRadius, slices, loops);
 	}
