@@ -16,6 +16,7 @@
 #include "Disk.h" 
 #include "Satelite.h" 
 #include "Group.h"
+#include <stdio.h>
 //---------------------------------------------------------------------------
 
 // Viewport
@@ -41,7 +42,7 @@ viewCamera * currentView = &initial;
 GLfloat light_position1[] = {0, 0, 0, 1.0f};
 
 // Scene
-Mesh plane("f-16.obj", 4);
+Mesh plane("f-16.obj", 20);
 Group root;
 Sun sun;
 Group earthSystem;
@@ -54,6 +55,9 @@ static const unsigned int UP = 0;
 static const unsigned int DOWN = 1;
 static const unsigned int LEFT = 2;
 static const unsigned int RIGHT = 3;
+static const unsigned int _IN = 4;
+static const unsigned int _OUT = 5;
+static const unsigned int _ROTATE = 6;
 void updateProjection();
 void updateCamera();
 void rotate(double &vx, double &vy, double &vz, double ax, double ay, double az, double angle);
@@ -202,10 +206,10 @@ void initGL(){
 	
 
 	// set material property
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
-	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
-	glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
-	glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
 
 	glShadeModel(GL_SMOOTH);
 
@@ -283,7 +287,6 @@ void updateCamera(){
 void resize(int wW, int wH){
 	// Viewport set up     
 	Vp.w = wW; Vp.h = wH; 
-	glViewport(0,0, Vp.w, Vp.h); 
 
 	// Frustum set up
 	updateProjection();
@@ -294,8 +297,8 @@ void resize(int wW, int wH){
 void updateProjection(){
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	//Pj.xRight = Vp.w/ 2.0 / scale; Pj.xLeft = -Pj.xRight; 
-	//Pj.yTop = Vp.h/2.0 / scale;  Pj.yBot = -Pj.yTop; 
+	Pj.xRight = Vp.w/ 2.0 / scale; Pj.xLeft = -Pj.xRight; 
+	Pj.yTop = Vp.h/2.0 / scale;  Pj.yBot = -Pj.yTop; 
 	if(ortho){
 		glOrtho(Pj.xLeft,Pj.xRight, Pj.yBot,Pj.yTop, Pj.zNear, Pj.zFar);
 	} else {
@@ -531,26 +534,117 @@ void moveCamera(unsigned int direction){
 		currentView->lookY += wY;
 		currentView->lookZ += wZ;
 		break;
-	default:
+	case _IN:
+		// Ojo
+		eX = currentView->eyeX;
+		eY = currentView->eyeY;
+		eZ = currentView->eyeZ;
+
+		// Mira
+		lX = currentView->lookX;
+		lY = currentView->lookY;
+		lZ = currentView->lookZ;
+
+		// U = Ojo - Mira
+		uX = eX - lX;
+		uY = eY - lY;
+		uZ = eZ - lZ;	
+
+		// Normaliza W
+		length = sqrt((uX * uX)+(uY * uY)+(uZ * uZ)) * .5;
+		uX /= length;
+		uY /= length;
+		uZ /= length;
+
+		currentView->eyeX += uX;
+		currentView->eyeY += uY;
+		currentView->eyeZ += uZ;
+		break;
+	case _OUT:
+		// Ojo
+		eX = currentView->eyeX;
+		eY = currentView->eyeY;
+		eZ = currentView->eyeZ;
+
+		// Mira
+		lX = currentView->lookX;
+		lY = currentView->lookY;
+		lZ = currentView->lookZ;
+
+		// U = Ojo - Mira
+		uX = eX - lX;
+		uY = eY - lY;
+		uZ = eZ - lZ;	
+
+		// Normaliza W
+		length = sqrt((uX * uX)+(uY * uY)+(uZ * uZ)) * .5;
+		uX /= length;
+		uY /= length;
+		uZ /= length;
+
+		currentView->eyeX -= uX;
+		currentView->eyeY -= uY;
+		currentView->eyeZ -= uZ;
+		break;
+	case _ROTATE: {
+		// Ojo
+		eX = currentView->eyeX;
+		eY = currentView->eyeY;
+		eZ = currentView->eyeZ;
+
+		// Mira
+		lX = currentView->lookX;
+		lY = currentView->lookY;
+		lZ = currentView->lookZ;
+
+		// N = Ojo - Mira
+		// n = eye – look
+		GLdouble nX = eX - lX;
+		GLdouble nY = eY - lY;
+		GLdouble nZ = eZ - lZ;
+
+		GLdouble upX = currentView->upX;
+		GLdouble upY = currentView->upY;
+		GLdouble upZ = currentView->upZ;
+		
+		// u = up x n
+		GLdouble uX = upY * nZ - upZ * nY;
+		GLdouble uY = upZ * nX - upX * nZ;
+		GLdouble uZ = upX * nY - upY * nX;
+
+		// v = n x u
+		vX = nY * uZ - nZ * uY;
+		vY = nZ * uX - nX * uZ;
+		vZ = nX * uY - nY * uX;
+
+		// Normaliza v
+		length = sqrt((vX * vX)+(vY * vY)+(vZ * vZ));
+		vX /= length;
+		vY /= length;
+		vZ /= length;
+
+		rotate(currentView->lookX, currentView->lookY, currentView->lookZ, vX, vY, vZ, 0.1);
+		break;
+	} default:
 		break;
 	}
 }
 //--------------------------------------------------------------------------
 
-// rotate the vector (vx, vy, vz) around (ax, ay, az) by an angle "angle". Avector must be normalized.
+// rotate the vector (vx, vy, vz) around (ax, ay, az) by an angle "angle". A vector must be normalized.
 void rotate(double &vx, double &vy, double &vz, double ax, double ay, double az, double angle) {
-  double ca = cos(angle);
-  double sa = sin(angle);
-  double crossx = -vy*az + vz*ay;
-  double crossy = -vz*ax + vx*az;
-  double crossz = -vx*ay + vy*ax;
-  double dot = ax*vx + ay*vy + az*vz;
-  double rx = vx*ca + crossx*sa + dot*ax*(1-ca);
-  double ry = vy*ca + crossy*sa + dot*ay*(1-ca);
-  double rz = vz*ca + crossz*sa + dot*az*(1-ca);
-  vx = rx; 
-  vy = ry; 
-  vz = rz;
+	double ca = cos(angle);
+	double sa = sin(angle);
+	double crossx = -vy*az + vz*ay;
+	double crossy = -vz*ax + vx*az;
+	double crossz = -vx*ay + vy*ax;
+	double dot = ax*vx + ay*vy + az*vz;
+	double rx = vx*ca + crossx*sa + dot*ax*(1-ca);
+	double ry = vy*ca + crossy*sa + dot*ay*(1-ca);
+	double rz = vz*ca + crossz*sa + dot*az*(1-ca);
+	vx = rx; 
+	vy = ry; 
+	vz = rz;
 }
 //--------------------------------------------------------------------------
 
@@ -589,18 +683,18 @@ void keyPres(unsigned char key, int mX, int mY){
 	} else if(key == 'p') {
 		ortho = !ortho;
 		updateProjection();
+	} else if(key == 'm') {
+		scale += 0.05;
+		updateProjection();
+	} else if(key == 'M') {
+		scale -= 0.05;
+		updateProjection();
 	} else if(key == 'n') {
-		Pj.xLeft += 1;
-		Pj.xRight -= 1;
-		Pj.yBot += 1;
-		Pj.yTop -= 1;
-		updateProjection();
+		moveCamera(_IN);
+		updateCamera();
 	} else if(key == 'N') {
-		Pj.xLeft -= 1;
-		Pj.xRight += 1;
-		Pj.yBot -= 1;
-		Pj.yTop += 1;
-		updateProjection();
+		moveCamera(_OUT);
+		updateCamera();
 	} else if(key == 'u') {
 		moveCamera(RIGHT);
 		updateCamera();
@@ -614,6 +708,9 @@ void keyPres(unsigned char key, int mX, int mY){
 		moveCamera(DOWN);
 		updateCamera();
 	} else if(key == 'g') {
+		moveCamera(_ROTATE);
+		updateCamera();
+	} else if(key == 'r') {
 		GLdouble uX = currentView->upX;
 		GLdouble uY = currentView->upY; 
 		GLdouble uZ = currentView->upZ;
@@ -625,7 +722,7 @@ void keyPres(unsigned char key, int mX, int mY){
 
 		rotate(currentView->eyeX, currentView->eyeY, currentView->eyeZ, uX, uY, uZ, 0.1);
 		updateCamera();
-	} else if(key == 'G') {
+	} else if(key == 'R') {
 		GLdouble uX = currentView->upX;
 		GLdouble uY = currentView->upY; 
 		GLdouble uZ = currentView->upZ;
